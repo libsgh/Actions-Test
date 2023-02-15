@@ -1,0 +1,109 @@
+name: Nightly Build
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        type: choice
+        description: 'choose build branch'
+        options:
+          - main
+          - dev
+        default: dev
+      platforms:
+        type: choice
+        description: 'build platforms'
+        options:
+          - linux
+          - windows
+          - darwin
+        default: linux
+      achitectures:
+        type: choice
+        description: 'build achitectures'
+        options:
+          - 386
+          - amd64
+          - arm-5
+          - arm-6
+          - arm-7
+          - arm64
+          - mips
+          - mipsle
+          - mips64
+          - mips64le
+        default: amd64
+  push:
+    branches: [ dev ]
+  pull_request:
+    branches: [ dev ]
+jobs:
+  setup:
+    if: contains('["libsgh"]', github.actor)
+    name: build setup
+    runs-on: ubuntu-latest
+    outputs:
+      branch: ${{ steps.setup.outputs.branch }}
+      target: ${{ steps.setup.outputs.target }}
+    steps:
+      - name: setup
+        id: setup
+        run: |
+          if ${{ github.event.inputs.platforms == ''}}; then
+            platforms="linux"
+          else
+            platforms="${{ github.event.inputs.platforms }}"
+          fi
+          if ${{ github.event.inputs.achitectures == ''}}; then
+            achitectures="amd64"
+            target='["linux/386", "linux/amd64", "linux/arm64", "linux/arm5", "linux/arm6", "linux/arm7", "windows/amd64", "window/386", "darwin-10.12/amd64", "darwin-10.12/arm64", "static/ui"]'
+          else
+            achitectures="${{ github.event.inputs.achitectures }}"
+            target='["'${platforms}'/'${achitectures}'"]'
+          fi
+          list=$(echo ${target} | jq -c)
+          echo "target=${list}" >> $GITHUB_OUTPUT
+          if ${{ github.event.inputs.branch == ''}}; then
+            branch='["dev"]'
+          else
+            branch='["${{ github.event.inputs.branch }}"]'
+          fi
+          b=$(echo ${branch} | jq -c)
+          echo "branch=${b}" >> $GITHUB_OUTPUT
+  build:
+    if: contains('["libsgh"]', github.actor)
+    needs: setup
+    strategy:
+      matrix:
+        target: ${{ fromJson(needs.setup.outputs.target) }}
+        branch: ${{ fromJson(needs.setup.outputs.branch) }}
+        go-version: [1.19]
+    name: build
+    runs-on: ubuntu-latest
+    outputs:
+      artifact_name: ${{ steps.artifact.outputs.name }}
+    steps:
+      - name: Setup Artifact Name
+        id: artifact
+        run: |
+          tar=${{ matrix.target }}
+          a=${tar//'/'/'-'}
+          echo "name=${a}" >> $GITHUB_OUTPUT
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ${{ matrix.go-version }}
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          ref: ${{ matrix.branch }}
+          fetch-depth: 0
+      - name: Build Actions-Test
+        uses: libsgh/Actions-Test-build-action@main
+        with:
+          target: ${{ matrix.target }}
+      - name: upload-Actions-Test
+        uses: actions/upload-artifact@v3
+        with:
+          name: Actions-Test-${{ steps.artifact.outputs.name }}
+          path: ${{ github.workspace }}/dist/*
