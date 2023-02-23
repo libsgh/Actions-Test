@@ -63,7 +63,7 @@ jobs:
           list=$(echo ${target} | jq -c)
           echo "target=${list}" >> $GITHUB_OUTPUT
           if ${{ github.event.inputs.branch == ''}}; then
-            branch='["dev"]'
+            branch='["main"]'
           else
             branch='["${{ github.event.inputs.branch }}"]'
           fi
