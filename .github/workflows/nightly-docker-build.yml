@@ -1,4 +1,4 @@
-name: PanIndex Nightly Docker Build
+name: Actions-Test Nightly Docker Build
 on:
   push:
     branches: [ main ]
