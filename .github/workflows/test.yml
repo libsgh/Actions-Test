@@ -113,5 +113,5 @@ jobs:
           echo '${{ fromJson(needs.setup.outputs.docker_images) }}'
           docker manifest create iicm/actions-test:dev --amend iicm/actions-test:dev-linux-amd64 --amend iicm/actions-test:dev-linux-386
           docker manifest push --purge ${{ needs.setup.outputs.image_name }}
-          docker run --rm -it lumir/remove-dockerhub-tag --user iicm \
+          docker run --rm lumir/remove-dockerhub-tag --user iicm \
                      --password ${{ secrets.DOCKERHUB_TOKEN }} iicm/actions-test:dev-linux-amd64 iicm/actions-test:dev-linux-386
