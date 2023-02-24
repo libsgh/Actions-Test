@@ -20,8 +20,7 @@ jobs:
           target='["linux/amd64", "linux/386"]'
           list=$(echo ${target} | jq -c)
           echo "target=${list}" >> $GITHUB_OUTPUT
-          docker_images='["--amend iicm/actions-test-linux-amd64:dev", "--amend iicm/actions-test-linux-386:dev"]'
-          di=$(echo ${docker_images} | jq -c)
+          docker_images=("--amend iicm/actions-test-linux-amd64:dev" "--amend iicm/actions-test-linux-386:dev")
           echo "docker_images=${di}" >> $GITHUB_OUTPUT
           branch='["main"]'
           b=$(echo ${branch} | jq -c)
@@ -110,9 +109,8 @@ jobs:
       - name: Combine images
         run: |
           echo '${{ needs.setup.outputs.image_name }}'
-          images=${{ fromJson(needs.setup.outputs.docker_images) }}
-          echo '${images[@]}'
-          docker manifest create ${{ needs.setup.outputs.image_name }} ${images[@]}
+          echo '${{ needs.setup.outputs.docker_images[@] }}'
+          docker manifest create ${{ needs.setup.outputs.image_name }} ${{ needs.setup.outputs.docker_images[@] }}
           docker manifest push --purge ${{ needs.setup.outputs.image_name }}
           docker run --rm lumir/remove-dockerhub-tag --user iicm \
                      --password ${{ secrets.DOCKERHUB_TOKEN }} iicm/actions-test:dev-linux-amd64 iicm/actions-test:dev-linux-386
