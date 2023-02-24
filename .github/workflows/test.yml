@@ -111,7 +111,7 @@ jobs:
         run: |
           echo '${{ needs.setup.outputs.image_name }}'
           images=${{ fromJson(needs.setup.outputs.docker_images) }}
-          echo ${images[@]}
+          echo '${images[@]}'
           docker manifest create ${{ needs.setup.outputs.image_name }} ${images[@]}
           docker manifest push --purge ${{ needs.setup.outputs.image_name }}
           docker run --rm lumir/remove-dockerhub-tag --user iicm \
