@@ -107,11 +107,12 @@ jobs:
         with:
           username: iicm
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Combine two images
+      - name: Combine images
         run: |
           echo '${{ needs.setup.outputs.image_name }}'
-          echo '${{ fromJson(needs.setup.outputs.docker_images) }}'
-          docker manifest create iicm/actions-test:dev --amend iicm/actions-test:dev-linux-amd64 --amend iicm/actions-test:dev-linux-386
+          images=${{ fromJson(needs.setup.outputs.docker_images) }}
+          echo ${images[@]}
+          docker manifest create ${{ needs.setup.outputs.image_name }} ${images[@]}
           docker manifest push --purge ${{ needs.setup.outputs.image_name }}
           docker run --rm lumir/remove-dockerhub-tag --user iicm \
                      --password ${{ secrets.DOCKERHUB_TOKEN }} iicm/actions-test:dev-linux-amd64 iicm/actions-test:dev-linux-386
