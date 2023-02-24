@@ -96,22 +96,22 @@ jobs:
         run: |
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
-          docker manifest create iicm/actions-test:dev --amend iicm/actions-test:dev-${{ steps.artifact.outputs.name }}
+  combine:
+    runs-on: ubuntu-latest
+    needs:
+      - setup
+      - build
+    steps:
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: iicm
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Combine two images
+        run: |
+          echo '${{ needs.setup.outputs.image_name }}'
+          echo '${{ fromJson(needs.setup.outputs.docker_images) }}'
+          docker manifest create iicm/actions-test:dev --amend iicm/actions-test:dev-linux-amd64 --amend iicm/actions-test:dev-linux-386
           docker manifest push --purge ${{ needs.setup.outputs.image_name }}
-#  combine:
-#    runs-on: ubuntu-latest
-#    needs:
-#      - setup
-#      - build
-#    steps:
-#      - name: Login to Docker Hub
-#        uses: docker/login-action@v2
-#        with:
-#          username: iicm
-#          password: ${{ secrets.DOCKERHUB_TOKEN }}
-#      - name: Combine two images
-#        run: |
-#          echo '${{ needs.setup.outputs.image_name }}'
-#          echo '${{ fromJson(needs.setup.outputs.docker_images) }}'
-#          docker manifest create iicm/actions-test:dev --amend iicm/actions-test:dev-linux-amd64 --amend iicm/actions-test:dev-linux-386
-#          docker manifest push --purge ${{ needs.setup.outputs.image_name }}
+          docker run --rm -it lumir/remove-dockerhub-tag --user iicm \
+                     --password ${{ secrets.DOCKERHUB_TOKEN }} iicm/actions-test:dev-linux-amd64 iicm/actions-test:dev-linux-386
