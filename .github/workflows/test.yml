@@ -11,8 +11,8 @@ jobs:
     outputs:
       branch: ${{ steps.setup.outputs.branch }}
       target: ${{ steps.setup.outputs.target }}
-      docker-images: ${{ steps.setup.outputs.docker-images }}
-      image-name: "iicm/actions-test:dev"
+      docker_images: ${{ steps.setup.outputs.docker_images }}
+      image_name: "iicm/actions-test:dev"
     steps:
       - name: setup
         id: setup
@@ -20,9 +20,9 @@ jobs:
           target='["linux/amd64", "linux/arm64"]'
           list=$(echo ${target} | jq -c)
           echo "target=${list}" >> $GITHUB_OUTPUT
-          docker-images='["--amend iicm/actions-test-linux-amd64:dev", "--amend iicm/actions-test-linux-arm64:dev"]'
-          di=$(echo ${docker-images} | jq -c)
-          echo "docker-images=${di}" >> $GITHUB_OUTPUT
+          docker_images='["--amend iicm/actions-test-linux-amd64:dev", "--amend iicm/actions-test-linux-arm64:dev"]'
+          di=$(echo ${docker_images} | jq -c)
+          echo "docker_images=${di}" >> $GITHUB_OUTPUT
           branch='["main"]'
           b=$(echo ${branch} | jq -c)
           echo "branch=${b}" >> $GITHUB_OUTPUT
@@ -37,7 +37,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       artifact_name: ${{ steps.artifact.outputs.name }}
-      image_name: ${{ steps.artifact.outputs.name }}
     steps:
       - name: Setup Artifact Name
         id: artifact
@@ -97,7 +96,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Combine two images
         run: |
-          echo '${{ needs.setup.outputs.image-name }}'
-          echo '${{ needs.setup.outputs.docker-images }}'
-          docker manifest create ${{ needs.setup.outputs.image-name }} ${{ needs.setup.outputs.docker-images }}
-          docker manifest push ${{ needs.setup.outputs.image-name }}
+          echo '${{ needs.setup.outputs.image_name }}'
+          echo '${{ needs.setup.outputs.docker_images }}'
+          docker manifest create ${{ needs.setup.outputs.image-name }} ${{ needs.setup.outputs.docker_images }}
+          docker manifest push ${{ needs.setup.outputs.image_name }}
