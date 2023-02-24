@@ -17,10 +17,10 @@ jobs:
       - name: setup
         id: setup
         run: |
-          target='["linux/amd64"]'
+          target='["linux/amd64", "linux/386"]'
           list=$(echo ${target} | jq -c)
           echo "target=${list}" >> $GITHUB_OUTPUT
-          docker_images='["--amend iicm/actions-test-linux-amd64:dev"]'
+          docker_images='["--amend iicm/actions-test-linux-amd64:dev", "--amend iicm/actions-test-linux-386:dev"]'
           di=$(echo ${docker_images} | jq -c)
           echo "docker_images=${di}" >> $GITHUB_OUTPUT
           branch='["main"]'
