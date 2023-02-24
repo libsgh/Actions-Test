@@ -112,4 +112,4 @@ jobs:
           echo '${{ needs.setup.outputs.image_name }}'
           echo '${{ fromJson(needs.setup.outputs.docker_images) }}'
           docker manifest create iicm/actions-test:dev --amend iicm/actions-test:dev-linux-amd64 --amend iicm/actions-test:dev-linux-386
-          docker manifest push ${{ needs.setup.outputs.image_name }}
+          docker manifest push --purge ${{ needs.setup.outputs.image_name }}
