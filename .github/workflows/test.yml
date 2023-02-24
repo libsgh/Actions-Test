@@ -11,13 +11,18 @@ jobs:
     outputs:
       branch: ${{ steps.setup.outputs.branch }}
       target: ${{ steps.setup.outputs.target }}
+      docker-images: ${{ steps.setup.outputs.docker-images }}
+      image-name: "iicm/actions-test:dev"
     steps:
       - name: setup
         id: setup
         run: |
-          target='["linux/amd64", "linux/arm64", "linux/ppc64le", "linux/ppc64le", "linux/s390x", "linux/386", "linux/arm/v7", "linux/arm/v6"]'
+          target='["linux/amd64", "linux/arm64"]'
           list=$(echo ${target} | jq -c)
           echo "target=${list}" >> $GITHUB_OUTPUT
+          docker-images='["--amend iicm/actions-test-linux-amd64:dev", "--amend iicm/actions-test-linux-arm64:dev"]'
+          di=$(echo ${docker-images} | jq -c)
+          echo "docker-images=${di}" >> $GITHUB_OUTPUT
           branch='["main"]'
           b=$(echo ${branch} | jq -c)
           echo "branch=${b}" >> $GITHUB_OUTPUT
@@ -32,6 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       artifact_name: ${{ steps.artifact.outputs.name }}
+      image_name: ${{ steps.artifact.outputs.name }}
     steps:
       - name: Setup Artifact Name
         id: artifact
@@ -53,7 +59,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: iicm/actions-test
+          images: ${{ needs.setup.outputs.image-name }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -73,8 +79,23 @@ jobs:
             VERSION=${{ github.ref }}
             ARG0=nightly_docker
             APP_NAME=Actions-Test
-          tags: iicm/actions-test:dev
+          tags: iicm/actions-test-${{ steps.artifact.outputs.name }}:dev
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.target }}
           cache-from: type=gha
           cache-to: type=gha
+    combine:
+      runs-on: ubuntu-latest
+      needs: setup, build
+      steps:
+        - name: Login to Docker Hub
+          uses: docker/login-action@v2
+          with:
+            username: iicm
+            password: ${{ secrets.DOCKERHUB_TOKEN }}
+        - name: Combine two images
+          run: |
+            echo '${{ needs.setup.outputs.image-name }}'
+            echo '${{ needs.setup.outputs.docker-images }}'
+            docker manifest create ${{ needs.setup.outputs.image-name }} ${{ needs.setup.outputs.docker-images }}
+            docker manifest push ${{ needs.setup.outputs.image-name }}
