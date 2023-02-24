@@ -81,6 +81,8 @@ jobs:
         with:
           context: .
           push: true
+          provenance: false
+          sbom: false
           build-args: |
             VERSION=${{ github.ref }}
             ARG0=nightly_docker
