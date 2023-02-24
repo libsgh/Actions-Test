@@ -108,6 +108,6 @@ jobs:
       - name: Combine two images
         run: |
           echo '${{ needs.setup.outputs.image_name }}'
-          echo '${{ needs.setup.outputs.docker_images }}'
+          echo '${{ fromJson(needs.setup.outputs.docker_images) }}'
           docker manifest create ${{ needs.setup.outputs.image-name }} ${{ fromJson(needs.setup.outputs.docker_images) }}
           docker manifest push ${{ needs.setup.outputs.image_name }}
