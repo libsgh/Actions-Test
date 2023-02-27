@@ -14,9 +14,9 @@ RUN apk add --no-cache bash git curl go gcc musl-dev; \
 FROM alpine:edge
 MAINTAINER libsgh
 ARG APP_NAME
-ENV APP_NAME_ENV=${APP_NAME}
+ENV CMD_ENV="./${APP_NAME}"
 WORKDIR /app
 COPY --from=builder /app/bin/${APP_NAME} ./
 RUN ls -n
-RUN echo $APP_NAME_ENV
-CMD ["./$APP_NAME_ENV"]
+RUN echo $CMD_ENV
+CMD ["$CMD_ENV"]
