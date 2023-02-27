@@ -17,4 +17,4 @@ ARG APP_NAME
 WORKDIR /app
 COPY --from=builder /app/bin/$APP_NAME ./
 RUN ls -n
-CMD ["/app/Actions-Test"]
+CMD ["/app/$APP_NAME"]
