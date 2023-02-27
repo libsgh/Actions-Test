@@ -15,6 +15,6 @@ FROM alpine:edge
 MAINTAINER libsgh
 ARG APP_NAME
 WORKDIR /app
-COPY --from=builder /app/bin/Actions-Test ./
+COPY --from=builder /app/bin/$APP_NAME ./
 RUN ls -n
 CMD ["/app/Actions-Test"]
