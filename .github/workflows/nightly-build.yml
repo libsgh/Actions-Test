@@ -101,6 +101,7 @@ jobs:
       - name: Build Actions-Test
         uses: libsgh/go-build-action@main
         with:
+          type: "nightly_build"
           target: ${{ matrix.target }}
           go-version: ${{ matrix.go-version }}
           artifact-name: "Actions-Test"

@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         platform: [ubuntu-latest]
-        go-version: [1.19]
+        go-version: [1.20.1]
     name: PanIndex Release
     runs-on: ${{ matrix.platform }}
     steps:
@@ -22,6 +22,10 @@ jobs:
           ref: main
       - name: Build PanIndex
         uses: libsgh/PanIndex-build-action@main
+        with:
+          type: "release_build"
+          go-version: ${{ matrix.go-version }}
+          artifact-name: "Actions-Test"
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
