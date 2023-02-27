@@ -19,4 +19,4 @@ WORKDIR /app
 COPY --from=builder /app/bin/${APP_NAME} ./
 RUN ls -n
 RUN echo $APP_NAME_ENV
-CMD ["exec", "$APP_NAME_ENV"]
+CMD ["./$APP_NAME_ENV"]
