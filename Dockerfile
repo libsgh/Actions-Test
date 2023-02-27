@@ -19,4 +19,4 @@ WORKDIR /app
 COPY --from=builder /app/bin/${APP_NAME} /usr/local/bin
 RUN ls -n /usr/local/bin
 RUN echo $CMD_ENV
-CMD ["$CMD_ENV"]
+CMD ["Actions-Test"]
