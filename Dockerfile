@@ -18,5 +18,5 @@ ENV CMD_ENV="${APP_NAME}"
 WORKDIR /app
 COPY --from=builder /usr/local/bin/${APP_NAME} ./
 RUN ls -n
-RUN echo $CMD_ENV
+RUN echo ${CMD_ENV}
 CMD ["${CMD_ENV}"]
