@@ -83,7 +83,7 @@ jobs:
           sbom: false
           build-args: |
             VERSION=${{ github.ref }}
-            TYPE=nightly_docker
+            TYPE=nightly_build_docker
             APP_NAME=Actions-Test
           tags: iicm/actions-test:dev-${{ steps.artifact.outputs.name }}
           labels: ${{ steps.meta.outputs.labels }}
