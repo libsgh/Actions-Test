@@ -16,7 +16,7 @@ MAINTAINER libsgh
 ARG APP_NAME
 ENV CMD_ENV="${APP_NAME}"
 WORKDIR /app
-COPY --from=builder /usr/local/bin/${APP_NAME} ./
-RUN ls -n
-RUN echo ${CMD_ENV}
-CMD ["${CMD_ENV}"]
+COPY --from=builder /app/bin/${APP_NAME} /usr/local/bin
+RUN ls -n /usr/local/bin
+RUN echo $CMD_ENV
+CMD ["$CMD_ENV"]
