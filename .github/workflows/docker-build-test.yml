@@ -106,7 +106,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Combine images
         run: |
-          for image_name in ${{ join(fromJson(${{ needs.setup.outputs.image_name }}), ' ') }}
+          for image_name in ${{ join(fromJson(needs.setup.outputs.image_name), ' ') }}
           do
             args=""
             remove_tags=""
