@@ -12,17 +12,20 @@ jobs:
     outputs:
       branch: ${{ steps.setup.outputs.branch }}
       target: ${{ steps.setup.outputs.target }}
-      image_name: "iicm/actions-test:latest"
+      image_name: ${{ steps.setup.outputs.image_name }}
     steps:
       - name: setup
         id: setup
         run: |
           target='["linux/amd64", "linux/arm64", "linux/ppc64le", "linux/s390x", "linux/386", "linux/arm/v7", "linux/arm/v6"]'
           branch='["main"]'
+          image_name='["iicm/actions-test:latest", "iicm/actions-test:v1.0"]'
           list=$(echo ${target} | jq -c)
           echo "target=${list}" >> $GITHUB_OUTPUT
           b=$(echo ${branch} | jq -c)
           echo "branch=${b}" >> $GITHUB_OUTPUT
+          images=$(echo ${image_name} | jq -c)
+          echo "image_name=${images}" >> $GITHUB_OUTPUT
   build:
     if: contains('["libsgh"]', github.actor)
     needs: setup
@@ -52,11 +55,6 @@ jobs:
           persist-credentials: false
           ref: ${{ matrix.branch }}
           fetch-depth: 0
-      - name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v4
-        with:
-          images: ${{ needs.setup.outputs.image_name }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -85,14 +83,13 @@ jobs:
             VERSION=${{ github.ref }}
             TYPE=nightly_build_docker
             APP_NAME=Actions-Test
-          tags: ${{ needs.setup.outputs.image_name }}-${{ steps.artifact.outputs.name }}
+          tags: iicm/actions-test:latest-${{ steps.artifact.outputs.name }},iicm/actions-test:v1.0-${{ steps.artifact.outputs.name }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.target }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
       - name: Move cache
         run: |
-          echo '${{ steps.meta.outputs.tags }}'
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
   combine:
@@ -109,16 +106,20 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Combine images
         run: |
-          args=""
-          remove_tags=""
-          for target in ${{ join(fromJson(needs.setup.outputs.target), ' ') }}
+          for image_name in ${{ join(fromJson(${{ needs.setup.outputs.image_name }}), ' ') }}
           do
-            name=${target//'/'/'-'}
-            remove_tags="$remove_tags ${{ needs.setup.outputs.image_name }}-$name"
-            args="$args --amend ${{ needs.setup.outputs.image_name }}-$name"
+            args=""
+            remove_tags=""
+            for target in ${{ join(fromJson(needs.setup.outputs.target), ' ') }}
+            do
+              name=${target//'/'/'-'}
+              remove_tags="$remove_tags ${image_name}-$name"
+              args="$args --amend ${image_name}-$name"
+            done
+            docker manifest create ${image_name} ${args}
+            docker manifest push --purge ${image_name}
+            docker run --rm lumir/remove-dockerhub-tag --user iicm \
+                                 --password ${{ secrets.DOCKERHUB_TOKEN }} ${remove_tags}
           done
-          docker manifest create ${{ needs.setup.outputs.image_name }} ${args}
-          docker manifest push --purge ${{ needs.setup.outputs.image_name }}
-          docker run --rm lumir/remove-dockerhub-tag --user iicm \
-                               --password ${{ secrets.DOCKERHUB_TOKEN }} ${remove_tags}
+
         shell: bash
