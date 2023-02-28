@@ -16,5 +16,5 @@ MAINTAINER libsgh
 ARG APP_NAME
 ENV APP_NAME_ENV="${APP_NAME}"
 WORKDIR /app
-COPY --from=builder /app/bin/${APP_NAME} /usr/local/bin
+COPY --from=builder /app/bin/${APP_NAME} ./
 CMD ./$APP_NAME_ENV
