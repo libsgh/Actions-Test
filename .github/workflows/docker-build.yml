@@ -1,4 +1,4 @@
-name: PanIndex Docker Build
+name: Docker Build
 on:
   release:
     types: [created]
@@ -125,6 +125,6 @@ jobs:
             docker manifest create ${image_name} ${args}
             docker manifest push --purge ${image_name}
             docker run --rm lumir/remove-dockerhub-tag --user iicm \
-                                 --password ${{ secrets.DOCKERHUB_TOKEN }} ${remove_tags}
+                                 --password ${{ secrets.DOCKERHUB_PASSWORD }} ${remove_tags}
           done
         shell: bash

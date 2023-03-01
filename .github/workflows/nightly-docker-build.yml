@@ -120,5 +120,5 @@ jobs:
           docker manifest create ${{ needs.setup.outputs.image_name }} ${args}
           docker manifest push --purge ${{ needs.setup.outputs.image_name }}
           docker run --rm lumir/remove-dockerhub-tag --user iicm \
-                               --password ${{ secrets.DOCKERHUB_TOKEN }} ${remove_tags}
+                               --password ${{ secrets.DOCKERHUB_PASSWORD }} ${remove_tags}
         shell: bash
