@@ -22,7 +22,7 @@ jobs:
           image_base='iicm/actions-test'
           ref=${{ github.ref }}
           version=$(basename ${ref})
-          image_name='["'${image_base}':latest", "'${image_base}':'${version}'"]'
+          image_name='["'${image_base}':'${version}'", "'${image_base}':latest"]'
           list=$(echo ${target} | jq -c)
           echo "target=${list}" >> $GITHUB_OUTPUT
           b=$(echo ${branch} | jq -c)
