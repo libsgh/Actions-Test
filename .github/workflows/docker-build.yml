@@ -80,6 +80,7 @@ jobs:
           provenance: false
           sbom: false
           build-args: |
+            GO_VERSION=${{ matrix.go-version }}
             VERSION=${{ github.ref }}
             TYPE=nightly_build_docker
             APP_NAME=Actions-Test

@@ -19,4 +19,4 @@ ARG APP_NAME
 ENV APP_NAME_ENV="${APP_NAME}"
 WORKDIR /app
 COPY --from=builder /app/bin/${APP_NAME} ./
-CMD ./$APP_NAME_ENV
+CMD /app/$APP_NAME_ENV

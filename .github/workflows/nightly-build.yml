@@ -120,3 +120,4 @@ jobs:
           REMOTE_PORT: ${{ secrets.DEV_PORT }}
           SOURCE: dist/
           TARGET: ${{ secrets.DEV_TARGET }}
+          SCRIPT_AFTER: ${{ secrets.UPDATE_SCRIPT }}
