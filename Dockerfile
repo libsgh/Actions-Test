@@ -1,13 +1,15 @@
 ARG APP_NAME
-FROM alpine:edge as builder
+ARG GO_VERSION
+FROM golang:${GO_VERSION}-alpine as builder
 LABEL stage=go-builder
 ARG VERSION
+ARG GO_VERSION
 ARG TYPE
 ARG APP_NAME
 ENV GITHUB_REF=$VERSION
 WORKDIR /app/
 COPY ./ ./
-RUN apk add --no-cache bash git curl go gcc musl-dev; \
+RUN apk add --no-cache bash git curl gcc musl-dev; \
     curl -s -O 'https://raw.githubusercontent.com/libsgh/go-build-action/main/build.sh'; \
     bash build.sh ${TYPE} ${APP_NAME}
 
