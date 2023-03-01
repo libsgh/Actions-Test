@@ -1,14 +1,15 @@
-name: PanIndex Release
+name: Release Build
 on:
-#  release:
-#    types: [created]
+  release:
+    types: [created]
 jobs:
   release:
     strategy:
       matrix:
+        type: [release_build, release_build_musl]
         platform: [ubuntu-latest]
         go-version: [1.20.1]
-    name: PanIndex Release
+    name: Release and Build
     runs-on: ${{ matrix.platform }}
     steps:
       - name: Setup Go
@@ -16,17 +17,18 @@ jobs:
         with:
           go-version: ${{ matrix.go-version }}
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           persist-credentials: false
           ref: main
-      - name: Build PanIndex
-        uses: libsgh/PanIndex-build-action@main
+      - name: Build
+        uses: libsgh/go-build-action@main
         with:
-          type: "release_build"
+          type:  ${{ matrix.type }}
           go-version: ${{ matrix.go-version }}
           artifact-name: "Actions-Test"
       - name: Release
         uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: /home/runner/work/PanIndex/PanIndex/dist/compress/*
