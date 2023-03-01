@@ -11,21 +11,26 @@ jobs:
       branch: ${{ steps.setup.outputs.branch }}
       target: ${{ steps.setup.outputs.target }}
       image_name: ${{ steps.setup.outputs.image_name }}
+      version: ${{ steps.setup.outputs.version }}
+      image_base: ${{ steps.setup.outputs.image_base }}
     steps:
       - name: setup
         id: setup
         run: |
           target='["linux/amd64", "linux/arm64", "linux/ppc64le", "linux/s390x", "linux/386", "linux/arm/v7", "linux/arm/v6"]'
           branch='["main"]'
+          image_base='iicm/actions-test'
           ref=${{ github.ref }}
           version=$(basename ${ref})
-          image_name='["iicm/actions-test:latest", "iicm/actions-test:${version}"]'
+          image_name='["${image_base}:latest", "${image_base}:${version}"]'
           list=$(echo ${target} | jq -c)
           echo "target=${list}" >> $GITHUB_OUTPUT
           b=$(echo ${branch} | jq -c)
           echo "branch=${b}" >> $GITHUB_OUTPUT
           images=$(echo ${image_name} | jq -c)
           echo "image_name=${images}" >> $GITHUB_OUTPUT
+          echo "version=${version}" >> $GITHUB_OUTPUT
+          echo "image_base=${image_base}" >> $GITHUB_OUTPUT
   build:
     if: contains('["libsgh"]', github.actor)
     needs: setup
@@ -84,7 +89,7 @@ jobs:
             VERSION=${{ github.ref }}
             TYPE=nightly_build_docker
             APP_NAME=Actions-Test
-          tags: iicm/actions-test:latest-${{ steps.artifact.outputs.name }},iicm/actions-test:v1.0-${{ steps.artifact.outputs.name }}
+          tags: ${{ needs.setup.outputs.image_base }}:latest-${{ steps.artifact.outputs.name }},${{ needs.setup.outputs.image_base }}:${{ needs.setup.outputs.version }}-${{ steps.artifact.outputs.name }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: ${{ matrix.target }}
           cache-from: type=local,src=/tmp/.buildx-cache
