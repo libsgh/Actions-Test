@@ -111,6 +111,7 @@ jobs:
           name: Actions-Test-${{ steps.artifact.outputs.name }}
           path: ${{ github.workspace }}/dist/*
       - name: Deploy to Dev Server
+        if: contains('linux-amd64', steps.artifact.outputs.name)
         uses: easingthemes/ssh-deploy@main
         env:
           SSH_PRIVATE_KEY: ${{ secrets.DEV_PRIVATE_KEY }}
