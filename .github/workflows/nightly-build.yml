@@ -118,5 +118,5 @@ jobs:
           REMOTE_HOST: ${{ secrets.DEV_HOST }}
           REMOTE_USER: ${{ secrets.DEV_USERNAME }}
           REMOTE_PORT: ${{ secrets.DEV_PORT }}
-          SOURCE: dist/*.zip
+          SOURCE: dist/
           TARGET: ${{ secrets.DEV_TARGET }}
