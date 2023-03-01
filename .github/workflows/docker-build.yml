@@ -109,7 +109,7 @@ jobs:
         uses: docker/login-action@v2
         with:
           username: iicm
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
       - name: Combine images
         run: |
           for image_name in ${{ join(fromJson(needs.setup.outputs.image_name), ' ') }}
