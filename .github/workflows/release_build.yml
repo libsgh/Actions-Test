@@ -35,7 +35,7 @@ jobs:
         uses: libsgh/go-build-action@main
         with:
           type: "compress"
-          go-version: ${{ matrix.go-version }}
+          go-version: [1.20.1]
           artifact-name: "Actions-Test"
       - name: Release
         uses: softprops/action-gh-release@v1
