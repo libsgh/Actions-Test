@@ -10,7 +10,7 @@ ENV GITHUB_REF=$VERSION
 WORKDIR /app/
 COPY ./ ./
 RUN apk add --no-cache bash git curl gcc musl-dev; \
-    curl -s -O 'https://raw.githubusercontent.com/libsgh/go-build-action/main/build.sh'; \
+    curl -s -O 'https://raw.githubusercontent.com/px-org/build-action/main/build.sh'; \
     bash build.sh ${TYPE} ${APP_NAME}
 
 FROM alpine:edge

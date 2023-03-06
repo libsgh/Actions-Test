@@ -22,7 +22,7 @@ jobs:
           persist-credentials: false
           ref: main
       - name: Build
-        uses: libsgh/go-build-action@main
+        uses: px-org/build-action@main
         with:
           type:  ${{ matrix.type }}
           go-version: ${{ matrix.go-version }}
