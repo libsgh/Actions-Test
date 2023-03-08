@@ -121,3 +121,18 @@ jobs:
           SOURCE: dist/
           TARGET: ${{ secrets.DEV_TARGET }}
           SCRIPT_AFTER: ${{ secrets.UPDATE_SCRIPT }}
+      - name: Send Telegram Message
+        uses: appleboy/telegram-action@master
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        with:
+          to: ${{ secrets.TELEGRAM_ID }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          format: markdown
+          message: |
+            *1st line of your message with bold*
+            *2nd line of your message with bold, too*
+            Application: *Write something to be put inside your message*. The below lines still are part of your message.          
+            Branch: *${{ github.ref }}*
+            Repository: *${{ github.repository }}*
+            Owner: *${{ github.repository_owner }}*  

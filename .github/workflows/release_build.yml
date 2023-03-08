@@ -54,4 +54,3 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: ${{github.workspace}}/dist/sha256.list
-
